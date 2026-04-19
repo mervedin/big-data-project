@@ -1,0 +1,75 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15
+    container_name: postgres-news
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: YourPassword123
+      POSTGRES_DB: news_sentiment
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.5.0
+    container_name: zookeeper-news
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+    ports:
+      - "2181:2181"
+
+  kafka:
+    image: confluentinc/cp-kafka:7.5.0
+    container_name: kafka-news
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper-news:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka-news:29092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+
+  nifi:
+    image: apache/nifi:latest
+    container_name: nifi-news
+    ports:
+      - "8080:8080"
+    environment:
+      NIFI_WEB_HTTP_PORT: 8080
+
+  spark:
+    image: spark:latest
+    container_name: spark-news
+    ports:
+      - "8888:8888"
+      - "7077:7077"
+    environment:
+      SPARK_MODE: master
+
+  python-app:
+    build:
+      context: ./services/python-app
+    container_name: python-news
+    depends_on:
+      - postgres
+      - kafka
+    volumes:
+      - ./data:/app/data
+      - ./results:/app/results
+    environment:
+      POSTGRES_HOST: postgres-news
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: newsSentiment
+      POSTGRES_DB: news_sentiment
+      KAFKA_BOOTSTRAP_SERVERS: kafka-news:9092
+    command: python batch_pipeline.py
+
+volumes:
+  postgres_data:

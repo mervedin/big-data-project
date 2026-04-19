@@ -1,0 +1,17 @@
+# Python
+venv/
+__pycache__/
+*.pyc
+
+# Docker
+*.log
+
+# Results & data (optional – choose based on your preference)
+results/
+data/
+
+# OS
+.DS_Store
+
+# IDE
+.vscode/
