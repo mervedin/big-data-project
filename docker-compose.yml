@@ -17,7 +17,7 @@ services:
       - postgres
     environment:
       AIRFLOW__CORE__EXECUTOR: LocalExecutor
-      AIRFLOW__CORE__SQL_ALCHEMY_CONN: postgresql+psycopg2://postgres:YourPassword123@postgres/news_sentiment
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://postgres:YourPassword123@postgres/news_sentiment
       AIRFLOW__CORE__LOAD_EXAMPLES: "false"
       AIRFLOW__API__AUTH_BACKENDS: airflow.api.auth.backend.basic_auth
       _PIP_ADDITIONAL_REQUIREMENTS: apache-airflow-providers-docker
@@ -27,7 +27,8 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - ./:/project
     ports:
-       - "8080:8080"
+      - "8080:8080"
+    command: webserver
   airflow-init:
     image: apache/airflow:2.10.2
     depends_on:
@@ -54,16 +55,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - ./:/project
     command: >
-      bash -c "
-      airflow db migrate &&
-      airflow users create
-        --username admin
-        --password admin
-        --firstname Admin
-        --lastname User
-        --role Admin
-        --email admin@example.com
-      "
+      bash -c "airflow db migrate && airflow users create --username admin --password admin --firstname Admin --lastname User --role Admin --email admin@example.com"
   airflow-scheduler:
     image: apache/airflow:2.10.2
     depends_on:
