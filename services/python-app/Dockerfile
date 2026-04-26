@@ -5,7 +5,7 @@ WORKDIR /app
 RUN apt-get update && apt-get install -y gcc postgresql-client && rm -rf /var/lib/apt/lists/*
 
 COPY requirements.txt .
-RUN pip3 install --no-cache-dir -r requirements.txt
+RUN TMPDIR=/var/tmp pip3 install --no-cache-dir -r requirements.txt
 
 COPY batch_pipeline.py .
 
