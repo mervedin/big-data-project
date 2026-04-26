@@ -3,7 +3,6 @@ version: '3.8'
 services:
   postgres:
     image: postgres:15
-    container_name: postgres-news
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: YourPassword123
@@ -12,7 +11,77 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+  airflow-webserver:
+    image: apache/airflow:2.10.2
+    depends_on:
+      - postgres
+    environment:
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+      AIRFLOW__CORE__SQL_ALCHEMY_CONN: postgresql+psycopg2://postgres:YourPassword123@postgres/news_sentiment
+      AIRFLOW__CORE__LOAD_EXAMPLES: "false"
+      AIRFLOW__API__AUTH_BACKENDS: airflow.api.auth.backend.basic_auth
+      _PIP_ADDITIONAL_REQUIREMENTS: apache-airflow-providers-docker
+    volumes:
+      - ./dags:/opt/airflow/dags
+      - ./logs:/opt/airflow/logs
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./:/project
+    ports:
+       - "8080:8080"
+  airflow-init:
+    image: apache/airflow:2.10.2
+    depends_on:
+      - postgres
+    environment:
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+      AIRFLOW__CORE__SQL_ALCHEMY_CONN: postgresql+psycopg2://postgres:YourPassword123@postgres/news_sentiment
+      AIRFLOW__CORE__LOAD_EXAMPLES: "false"
+      AIRFLOW__API__AUTH_BACKENDS: airflow.api.auth.backend.basic_auth
 
+      # Admin user creation
+      _AIRFLOW_WWW_USER_USERNAME: admin
+      _AIRFLOW_WWW_USER_PASSWORD: admin
+      _AIRFLOW_WWW_USER_FIRSTNAME: Admin
+      _AIRFLOW_WWW_USER_LASTNAME: User
+      _AIRFLOW_WWW_USER_ROLE: Admin
+      _AIRFLOW_WWW_USER_EMAIL: admin@example.com
+
+      # Needed for DockerOperator
+      _PIP_ADDITIONAL_REQUIREMENTS: apache-airflow-providers-docker
+    volumes:
+      - ./dags:/opt/airflow/dags
+      - ./logs:/opt/airflow/logs
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./:/project
+    command: >
+      bash -c "
+      airflow db migrate &&
+      airflow users create
+        --username admin
+        --password admin
+        --firstname Admin
+        --lastname User
+        --role Admin
+        --email admin@example.com
+      "
+  airflow-scheduler:
+    image: apache/airflow:2.10.2
+    depends_on:
+      - postgres
+    environment:
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+      AIRFLOW__CORE__SQL_ALCHEMY_CONN: postgresql+psycopg2://postgres:YourPassword123@postgres/news_sentiment
+      AIRFLOW__CORE__LOAD_EXAMPLES: "false"
+      AIRFLOW__API__AUTH_BACKENDS: airflow.api.auth.backend.basic_auth
+
+      # DockerOperator support
+      _PIP_ADDITIONAL_REQUIREMENTS: apache-airflow-providers-docker
+    volumes:
+      - ./dags:/opt/airflow/dags
+      - ./logs:/opt/airflow/logs
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./:/project
+    command: scheduler
   zookeeper:
     image: confluentinc/cp-zookeeper:7.5.0
     container_name: zookeeper-news
@@ -23,7 +92,6 @@ services:
 
   kafka:
     image: confluentinc/cp-kafka:7.5.0
-    container_name: kafka-news
     depends_on:
       - zookeeper
     ports:
@@ -31,11 +99,26 @@ services:
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper-news:2181
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka-news:29092,PLAINTEXT_HOST://localhost:9092
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
-      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-
+  
+  kafka-producer:
+    build: ./services/kafka-producer
+    container_name: kafka-producer
+    depends_on:
+      - kafka
+    volumes:
+      - ./data:/data
+  
+  spark-job:
+    build: ./services/spark-job
+    depends_on:
+     - kafka
+    volumes:
+     - ./results:/results
+    environment:
+     - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
   nifi:
     image: apache/nifi:latest
     container_name: nifi-news
@@ -63,8 +146,9 @@ services:
       - postgres
       - kafka
     volumes:
-      - ./data:/app/data
-      - ./results:/app/results
+      - ./data:/data
+      - ./results:/results
+      - ./logs:/logs
     environment:
       POSTGRES_HOST: postgres-news
       POSTGRES_USER: postgres
