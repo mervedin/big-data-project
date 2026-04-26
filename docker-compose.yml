@@ -54,6 +54,8 @@ services:
       SPARK_MODE: master
 
   python-app:
+    env_file:
+      - .env
     build:
       context: ./services/python-app
     container_name: python-news
