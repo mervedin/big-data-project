@@ -15,3 +15,7 @@ data/
 
 # IDE
 .vscode/
+
+.env
+
+logs/
