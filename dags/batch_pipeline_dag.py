@@ -36,10 +36,10 @@ with DAG(
           --topic news_articles \
           --partitions 1 \
           --replication-factor 1 && \
-        curl -X POST \
+        curl -f -X POST \
           'http://news-api:8000/search-and-send-to-kafka?query=technology&page_size=50' \
           -H 'Content-Type: application/json' \
-          && echo "✅ News fetched and sent to Kafka"
+          && echo "News fetched and sent to Kafka"
         """,
         execution_timeout=timedelta(minutes=10),
     )

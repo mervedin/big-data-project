@@ -52,6 +52,14 @@ def main():
         .load()
     )
 
+    kafka_count = kafka_df.count()
+    print(f"📨 Records read from Kafka topic '{TOPIC_NAME}': {kafka_count}")
+
+    if kafka_count == 0:
+        print("⚠️  No messages in Kafka topic. Exiting without writing output.")
+        spark.stop()
+        return
+
     # Parse JSON messages
     parsed_df = (
         kafka_df
@@ -68,6 +76,10 @@ def main():
             coalesce(col("data.content"), col("data.description"), col("data.title")).alias("text_to_analyze")
         )
     )
+
+    parsed_count = parsed_df.count()
+    print(f"✅ Records after JSON parsing: {parsed_count}")
+    parsed_df.show(5, truncate=True)
 
     # Run DistilBERT sentiment analysis
     result_df = analyze_sentiment(parsed_df)
