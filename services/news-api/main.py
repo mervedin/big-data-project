@@ -20,17 +20,23 @@ NEWS_API_BASE_URL = "https://newsapi.org/v2"
 KAFKA_BROKER = os.getenv("KAFKA_BROKER", "kafka:9092")
 KAFKA_TOPIC = "news_articles"
 
-# Initialize Kafka producer
-try:
-    kafka_producer = KafkaProducer(
-        bootstrap_servers=KAFKA_BROKER,
-        value_serializer=lambda v: json.dumps(v).encode("utf-8"),
-        request_timeout_ms=10000,
-    )
-    logger.info("✅ Connected to Kafka")
-except Exception as e:
-    logger.warning(f"⚠️ Kafka not available: {e}")
-    kafka_producer = None
+# Kafka producer — lazy, reconnects on each call
+kafka_producer = None
+
+def get_kafka_producer():
+    global kafka_producer
+    if kafka_producer is None:
+        try:
+            kafka_producer = KafkaProducer(
+                bootstrap_servers=KAFKA_BROKER,
+                value_serializer=lambda v: json.dumps(v).encode("utf-8"),
+                request_timeout_ms=10000,
+            )
+            logger.info("✅ Connected to Kafka")
+        except Exception as e:
+            logger.warning(f"⚠️ Kafka not available: {e}")
+            kafka_producer = None
+    return kafka_producer
 
 
 # Pydantic models
@@ -195,7 +201,8 @@ async def search_and_send_to_kafka(
     page_size: int = Query(10, ge=1, le=100, description="Number of articles"),
 ):
     """Search for news and send to Kafka for sentiment analysis"""
-    if not kafka_producer:
+    producer = get_kafka_producer()
+    if not producer:
         raise HTTPException(
             status_code=503,
             detail="Kafka service not available",
@@ -220,10 +227,10 @@ async def search_and_send_to_kafka(
                 "content": article.get("content"),
                 "fetched_at": datetime.now().isoformat(),
             }
-            kafka_producer.send(KAFKA_TOPIC, value=message)
+            producer.send(KAFKA_TOPIC, value=message)
             sent_count += 1
 
-        kafka_producer.flush()
+        producer.flush()
 
         return {
             "status": "success",
