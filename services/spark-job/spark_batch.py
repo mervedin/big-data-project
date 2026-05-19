@@ -1,3 +1,5 @@
+import os
+
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import col, from_json, coalesce
 from pyspark.sql.types import StructType, StringType
@@ -11,9 +13,16 @@ OUTPUT_PATH = "/results/sentiments"
 
 
 def main():
+    # Pre-create the output directory so the volume mount is ready
+    os.makedirs(OUTPUT_PATH, exist_ok=True)
+
     spark = (
         SparkSession.builder
         .appName("KafkaSparkBatchSentiment")
+        # Use committer algorithm v2: writes directly without the _temporary rename step,
+        # avoiding FileNotFoundException on Docker-mounted volumes.
+        .config("spark.hadoop.mapreduce.fileoutputcommitter.algorithm.version", "2")
+        .config("spark.hadoop.mapreduce.fileoutputcommitter.cleanup-failures.ignored", "true")
         .getOrCreate()
     )
 

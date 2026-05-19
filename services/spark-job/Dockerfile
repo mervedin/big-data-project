@@ -11,6 +11,7 @@ RUN apt-get update && apt-get install -y \
 # huggingface_hub is pinned to <0.30 to avoid hf-xet (broken on aarch64/amd64).
 # transformers 4.40.2 requires huggingface_hub>=0.23.0, so 0.25.2 satisfies it.
 RUN pip install --no-cache-dir \
+    'typing-extensions==4.7.1' \
     'huggingface_hub==0.25.2' \
     'transformers==4.40.2' \
     'torch==2.1.2' \
