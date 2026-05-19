@@ -48,8 +48,7 @@ with DAG(
     run_sentiment_analysis = BashOperator(
         task_id="run_ml_sentiment_analysis",
         bash_command="""
-        # Find the host path of the project directory from this container's /project mount
-        HOST_PROJECT_DIR=$(docker inspect $(hostname) --format '{{`{{ range .Mounts }}{{ if eq .Destination "/project" }}{{ .Source }}{{ end }}{{ end }}`}}')
+        HOST_PROJECT_DIR=$(docker inspect $(hostname) --format '{{{{ range .Mounts }}}}{{{{ if eq .Destination "/project" }}}}{{{{ .Source }}}}{{{{ end }}}}{{{{ end }}}}')
         HOST_DATA_DIR="${HOST_PROJECT_DIR}/data"
         mkdir -p "${HOST_DATA_DIR}"
         echo "Writing results to host path: ${HOST_DATA_DIR}"
