@@ -6,19 +6,15 @@ RUN apt-get update && apt-get install -y \
     python3-pip \
     python3-dev \
     git \
-    build-essential \
-    rustc \
-    cargo \
     && rm -rf /var/lib/apt/lists/*
 
-# Install ML dependencies - explicitly exclude problematic typing-extensions from torch index
+# Pin huggingface_hub<0.36 to avoid hf-xet which requires Rust edition2024
+# Install torch CPU-only build to keep image size manageable
 RUN pip install --no-cache-dir \
-    maturin && \
+    'huggingface_hub==0.35.0' && \
     pip install --no-cache-dir \
-    'typing-extensions<4.5' && \
-    pip install --no-cache-dir \
-    'transformers==4.25.1' \
-    'torch==1.13.1'  --extra-index-url https://download.pytorch.org/whl/cpu
+    'transformers==4.40.2' \
+    'torch==2.1.2' --extra-index-url https://download.pytorch.org/whl/cpu
 
 WORKDIR /app
 
