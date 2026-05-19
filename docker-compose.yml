@@ -115,6 +115,22 @@ services:
      - ./results:/results
     environment:
      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+
+  news-api:
+    build: ./services/news-api
+    container_name: news-api
+    depends_on:
+      - kafka
+    env_file:
+      - .env
+    ports:
+      - "8001:8000"
+    volumes:
+      - ./results:/project/results
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      KAFKA_BROKER: kafka:9092
+      RESULTS_PATH: /project/results
   nifi:
     image: apache/nifi:latest
     container_name: nifi-news

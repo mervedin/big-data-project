@@ -253,11 +253,12 @@ async def trigger_sentiment_analysis():
         
         # Run Spark sentiment analysis
         logger.info("📊 Starting sentiment analysis job...")
+        results_path = os.getenv("RESULTS_PATH", "/project/results")
         result = subprocess.run(
             [
                 "docker", "run", "--rm",
                 "--network", "big-data-project_default",
-                "-v", "/Users/mervedin/Desktop/big_data/big-data-project/results:/results",
+                "-v", f"{results_path}:/results",
                 "big-data-project-spark-job:latest"
             ],
             capture_output=True,
@@ -267,7 +268,7 @@ async def trigger_sentiment_analysis():
         
         if result.returncode == 0:
             # Post-process: Add headers to CSV file
-            csv_dir = "/Users/mervedin/Desktop/big_data/big-data-project/results/sentiments"
+            csv_dir = os.path.join(os.getenv("RESULTS_PATH", "/project/results"), "sentiments")
             csv_files = glob.glob(os.path.join(csv_dir, "part-*.csv"))
             
             if csv_files:
