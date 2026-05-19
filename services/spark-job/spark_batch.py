@@ -1,6 +1,5 @@
-import json
 from pyspark.sql import SparkSession
-from pyspark.sql.functions import col, from_json, coalesce, lit
+from pyspark.sql.functions import col, from_json, coalesce
 from pyspark.sql.types import StructType, StringType
 
 from sentiment_logic import analyze_sentiment
@@ -20,15 +19,7 @@ def main():
 
     spark.sparkContext.setLogLevel("WARN")
 
-    # Create header file first
-    header_path = f"{OUTPUT_PATH}/header.txt"
-    try:
-        with open(header_path, 'w') as f:
-            f.write("source,author,title,description,url,published_at,sentiment,fetched_at\n")
-    except Exception as e:
-        print(f"Note: Could not write header file: {e}")
-
-    # Schema of Kafka message value (JSON) - includes all fields from API
+    # Schema of Kafka message value (JSON)
     schema = StructType() \
         .add("source", StringType()) \
         .add("author", StringType()) \
@@ -40,13 +31,15 @@ def main():
         .add("content", StringType()) \
         .add("fetched_at", StringType())
 
-    # Read from Kafka (batch-style using Structured Streaming)
+    # ✅ TRUE BATCH READ — no streaming, no checkpoints, no partition metadata issues
     kafka_df = (
-        spark.readStream
+        spark.read
         .format("kafka")
         .option("kafka.bootstrap.servers", KAFKA_BROKER)
         .option("subscribe", TOPIC_NAME)
         .option("startingOffsets", "earliest")
+        .option("endingOffsets", "latest")
+        .option("failOnDataLoss", "false")
         .load()
     )
 
@@ -60,34 +53,27 @@ def main():
             col("data.title"),
             col("data.description"),
             col("data.url"),
-            col("data.image"),
             col("data.published_at"),
             col("data.content"),
             col("data.fetched_at"),
-            # Use title first, fallback to description for sentiment analysis
             coalesce(col("data.content"), col("data.description"), col("data.title")).alias("text_to_analyze")
         )
     )
 
-    # ✅ Reuse your existing batch logic here
+    # Run DistilBERT sentiment analysis
     result_df = analyze_sentiment(parsed_df)
 
-    # Coalesce to single file for easier viewing
-    result_df_single = result_df.coalesce(1)
-
-    # Write output as CSV (batch-style)
-    query = (
-        result_df_single.writeStream
-        .format("csv")
-        .option("path", OUTPUT_PATH)
-        .option("header", "true")  # Include header row
-        .option("checkpointLocation", "/tmp/checkpoints/sentiments")
-        .outputMode("append")
-        .trigger(once=True)   # ✅ MICRO-BATCH = BATCH
-        .start()
+    # Write output as a single CSV file with header
+    (
+        result_df
+        .coalesce(1)
+        .write
+        .mode("overwrite")
+        .option("header", "true")
+        .csv(OUTPUT_PATH)
     )
 
-    query.awaitTermination()
+    print("✅ Sentiment analysis complete. Results saved to", OUTPUT_PATH)
     spark.stop()
 
 
