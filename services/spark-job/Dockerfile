@@ -5,16 +5,16 @@ USER root
 RUN apt-get update && apt-get install -y \
     python3-pip \
     python3-dev \
-    git \
     && rm -rf /var/lib/apt/lists/*
 
-# Pin huggingface_hub<0.36 to avoid hf-xet which requires Rust edition2024
-# Install torch CPU-only build to keep image size manageable
+# Install all ML deps in one command so pip resolves versions together.
+# huggingface_hub is pinned to <0.30 to avoid hf-xet (broken on aarch64/amd64).
+# transformers 4.40.2 requires huggingface_hub>=0.23.0, so 0.25.2 satisfies it.
 RUN pip install --no-cache-dir \
-    'huggingface_hub==0.35.0' && \
-    pip install --no-cache-dir \
+    'huggingface_hub==0.25.2' \
     'transformers==4.40.2' \
-    'torch==2.1.2' --extra-index-url https://download.pytorch.org/whl/cpu
+    'torch==2.1.2' \
+    --extra-index-url https://download.pytorch.org/whl/cpu
 
 WORKDIR /app
 

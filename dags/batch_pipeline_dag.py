@@ -29,8 +29,15 @@ with DAG(
     fetch_news = BashOperator(
         task_id="fetch_news_to_kafka",
         bash_command="""
+        # Ensure the Kafka topic exists before sending
+        docker exec $(docker ps -qf name=kafka) \
+          kafka-topics --bootstrap-server kafka:9092 \
+          --create --if-not-exists \
+          --topic news_articles \
+          --partitions 1 \
+          --replication-factor 1 && \
         curl -X POST \
-          'http://localhost:8001/search-and-send-to-kafka?query=technology&page_size=50' \
+          'http://news-api:8000/search-and-send-to-kafka?query=technology&page_size=50' \
           -H 'Content-Type: application/json' \
           && echo "✅ News fetched and sent to Kafka"
         """,
@@ -43,7 +50,7 @@ with DAG(
         bash_command="""
         docker run --rm \
           --network big-data-project_default \
-          -v /project/results:/results \
+          --mount source=big-data-project_results_data,target=/results \
           big-data-project-spark-job:latest \
         && echo "✅ ML sentiment analysis complete"
         """,
