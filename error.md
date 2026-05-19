@@ -1,61 +1,116 @@
 
 
-fe21570d499e
+Details
+
+Graph
+
+Gantt
+
+Code
+
+Event Log
+
+Logs
+
+XCom
+
+
+
+cf517718254c
 *** Found local files:
-***   * /opt/airflow/logs/dag_id=batch_kafka_spark_pipeline/run_id=manual__2026-05-19T17:06:50.935179+00:00/task_id=run_ml_sentiment_analysis/attempt=1.log
-[2026-05-19, 17:06:52 UTC] {local_task_job_runner.py:123} ▼ Pre task execution logs
-[2026-05-19, 17:06:52 UTC] {taskinstance.py:2612} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: batch_kafka_spark_pipeline.run_ml_sentiment_analysis manual__2026-05-19T17:06:50.935179+00:00 [queued]>
-[2026-05-19, 17:06:52 UTC] {taskinstance.py:2612} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: batch_kafka_spark_pipeline.run_ml_sentiment_analysis manual__2026-05-19T17:06:50.935179+00:00 [queued]>
-[2026-05-19, 17:06:52 UTC] {taskinstance.py:2865} INFO - Starting attempt 1 of 3
-[2026-05-19, 17:06:52 UTC] {taskinstance.py:2888} INFO - Executing <Task(BashOperator): run_ml_sentiment_analysis> on 2026-05-19 17:06:50.935179+00:00
-[2026-05-19, 17:06:52 UTC] {logging_mixin.py:190} WARNING - /home/airflow/.local/lib/python3.12/site-packages/airflow/task/task_runner/standard_task_runner.py:70 DeprecationWarning: This process (pid=212) is multi-threaded, use of fork() may lead to deadlocks in the child.
-[2026-05-19, 17:06:52 UTC] {standard_task_runner.py:72} INFO - Started process 213 to run task
-[2026-05-19, 17:06:52 UTC] {standard_task_runner.py:104} INFO - Running: ['airflow', 'tasks', 'run', 'batch_kafka_spark_pipeline', 'run_ml_sentiment_analysis', 'manual__2026-05-19T17:06:50.935179+00:00', '--job-id', '72', '--raw', '--subdir', 'DAGS_FOLDER/batch_pipeline_dag.py', '--cfg-path', '/tmp/tmp25y7hopv']
-[2026-05-19, 17:06:52 UTC] {standard_task_runner.py:105} INFO - Job 72: Subtask run_ml_sentiment_analysis
-[2026-05-19, 17:06:52 UTC] {logging_mixin.py:190} WARNING - /home/airflow/.local/lib/python3.12/site-packages/airflow/settings.py:209 DeprecationWarning: The sql_alchemy_conn option in [core] has been moved to the sql_alchemy_conn option in [database] - the old setting has been used, but please update your config.
-[2026-05-19, 17:06:52 UTC] {task_command.py:467} INFO - Running <TaskInstance: batch_kafka_spark_pipeline.run_ml_sentiment_analysis manual__2026-05-19T17:06:50.935179+00:00 [running]> on host fe21570d499e
-[2026-05-19, 17:06:52 UTC] {abstractoperator.py:778} ERROR - Exception rendering Jinja template for task 'run_ml_sentiment_analysis', field 'bash_command'. Template: '\n        # Find the host path of the project directory from this container\'s /project mount\n        HOST_PROJECT_DIR=$(docker inspect $(hostname) --format \'{{`{{ range .Mounts }}{{ if eq .Destination "/project" }}{{ .Source }}{{ end }}{{ end }}`}}\')\n        HOST_DATA_DIR="${HOST_PROJECT_DIR}/data"\n        mkdir -p "${HOST_DATA_DIR}"\n        echo "Writing results to host path: ${HOST_DATA_DIR}"\n        docker run --rm           --network big-data-project_default           -v "${HOST_DATA_DIR}:/results"           big-data-project-spark-job:latest         && echo "ML sentiment analysis complete"\n        '
+***   * /opt/airflow/logs/dag_id=batch_kafka_spark_pipeline/run_id=manual__2026-05-19T17:21:07.146020+00:00/task_id=fetch_news_to_kafka/attempt=1.log
+[2026-05-19, 17:21:07 UTC] {local_task_job_runner.py:123} ▼ Pre task execution logs
+[2026-05-19, 17:21:07 UTC] {taskinstance.py:2612} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: batch_kafka_spark_pipeline.fetch_news_to_kafka manual__2026-05-19T17:21:07.146020+00:00 [queued]>
+[2026-05-19, 17:21:07 UTC] {taskinstance.py:2612} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: batch_kafka_spark_pipeline.fetch_news_to_kafka manual__2026-05-19T17:21:07.146020+00:00 [queued]>
+[2026-05-19, 17:21:07 UTC] {taskinstance.py:2865} INFO - Starting attempt 1 of 3
+[2026-05-19, 17:21:07 UTC] {taskinstance.py:2888} INFO - Executing <Task(BashOperator): fetch_news_to_kafka> on 2026-05-19 17:21:07.146020+00:00
+[2026-05-19, 17:21:07 UTC] {logging_mixin.py:190} WARNING - /home/airflow/.local/lib/python3.12/site-packages/airflow/task/task_runner/standard_task_runner.py:70 DeprecationWarning: This process (pid=396) is multi-threaded, use of fork() may lead to deadlocks in the child.
+[2026-05-19, 17:21:07 UTC] {standard_task_runner.py:72} INFO - Started process 397 to run task
+[2026-05-19, 17:21:07 UTC] {standard_task_runner.py:104} INFO - Running: ['airflow', 'tasks', 'run', 'batch_kafka_spark_pipeline', 'fetch_news_to_kafka', 'manual__2026-05-19T17:21:07.146020+00:00', '--job-id', '84', '--raw', '--subdir', 'DAGS_FOLDER/batch_pipeline_dag.py', '--cfg-path', '/tmp/tmpf1oiujmk']
+[2026-05-19, 17:21:07 UTC] {standard_task_runner.py:105} INFO - Job 84: Subtask fetch_news_to_kafka
+[2026-05-19, 17:21:07 UTC] {logging_mixin.py:190} WARNING - /home/airflow/.local/lib/python3.12/site-packages/airflow/settings.py:209 DeprecationWarning: The sql_alchemy_conn option in [core] has been moved to the sql_alchemy_conn option in [database] - the old setting has been used, but please update your config.
+[2026-05-19, 17:21:07 UTC] {task_command.py:467} INFO - Running <TaskInstance: batch_kafka_spark_pipeline.fetch_news_to_kafka manual__2026-05-19T17:21:07.146020+00:00 [running]> on host cf517718254c
+[2026-05-19, 17:21:07 UTC] {taskinstance.py:3131} INFO - Exporting env vars: AIRFLOW_CTX_DAG_OWNER='airflow' AIRFLOW_CTX_DAG_ID='batch_kafka_spark_pipeline' AIRFLOW_CTX_TASK_ID='fetch_news_to_kafka' AIRFLOW_CTX_EXECUTION_DATE='2026-05-19T17:21:07.146020+00:00' AIRFLOW_CTX_TRY_NUMBER='1' AIRFLOW_CTX_DAG_RUN_ID='manual__2026-05-19T17:21:07.146020+00:00'
+[2026-05-19, 17:21:07 UTC] {taskinstance.py:731} ▲▲▲ Log group end
+[2026-05-19, 17:21:07 UTC] {subprocess.py:63} INFO - Tmp dir root location: /tmp
+[2026-05-19, 17:21:07 UTC] {subprocess.py:75} INFO - Running command: ['/usr/bin/bash', '-c', '\n        # Ensure the Kafka topic exists before sending\n        docker exec $(docker ps -qf name=kafka)           kafka-topics --bootstrap-server kafka:9092           --create --if-not-exists           --topic news_articles           --partitions 1           --replication-factor 1 &&         curl -f -X POST           \'http://news-api:8000/search-and-send-to-kafka?query=technology&page_size=50\'           -H \'Content-Type: application/json\'           && echo "News fetched and sent to Kafka"\n        ']
+[2026-05-19, 17:21:07 UTC] {subprocess.py:86} INFO - Output:
+[2026-05-19, 17:21:08 UTC] {subprocess.py:93} INFO - WARNING: Due to limitations in metric names, topics with a period ('.') or underscore ('_') could collide. To avoid issues it is best to use either, but not both.
+[2026-05-19, 17:21:08 UTC] {subprocess.py:93} INFO -   % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+[2026-05-19, 17:21:08 UTC] {subprocess.py:93} INFO -                                  Dload  Upload   Total   Spent    Left  Speed
+[2026-05-19, 17:21:08 UTC] {subprocess.py:93} INFO - 
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0
+  0    40    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0
+[2026-05-19, 17:21:08 UTC] {subprocess.py:93} INFO - curl: (22) The requested URL returned error: 503
+[2026-05-19, 17:21:08 UTC] {subprocess.py:97} INFO - Command exited with return code 22
+[2026-05-19, 17:21:08 UTC] {taskinstance.py:3310} ERROR - Task failed with exception
 Traceback (most recent call last):
-  File "/home/airflow/.local/lib/python3.12/site-packages/airflow/models/abstractoperator.py", line 770, in _do_render_template_fields
-    rendered_content = self.render_template(
-                       ^^^^^^^^^^^^^^^^^^^^^
-  File "/home/airflow/.local/lib/python3.12/site-packages/airflow/template/templater.py", line 170, in render_template
-    template = jinja_env.from_string(value)
-               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/airflow/.local/lib/python3.12/site-packages/jinja2/environment.py", line 1108, in from_string
-    return cls.from_code(self, self.compile(source), gs, None)
-                               ^^^^^^^^^^^^^^^^^^^^
-  File "/home/airflow/.local/lib/python3.12/site-packages/jinja2/environment.py", line 768, in compile
-    self.handle_exception(source=source_hint)
-  File "/home/airflow/.local/lib/python3.12/site-packages/jinja2/environment.py", line 939, in handle_exception
-    raise rewrite_traceback_stack(source=source)
-  File "<unknown>", line 3, in template
-jinja2.exceptions.TemplateSyntaxError: unexpected char '`' at 158
-[2026-05-19, 17:06:52 UTC] {taskinstance.py:3310} ERROR - Task failed with exception
+  File "/home/airflow/.local/lib/python3.12/site-packages/airflow/models/taskinstance.py", line 762, in _execute_task
+    result = _execute_callable(context=context, **execute_callable_kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.12/site-packages/airflow/models/taskinstance.py", line 733, in _execute_callable
+    return ExecutionCallableRunner(
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.12/site-packages/airflow/utils/operator_helpers.py", line 252, in run
+    return self.func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.12/site-packages/airflow/models/baseoperator.py", line 406, in wrapper
+    return func(self, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.12/site-packages/airflow/operators/bash.py", line 249, in execute
+    raise AirflowException(
+airflow.exceptions.AirflowException: Bash command failed. The command returned a non-zero exit code 22.
+[2026-05-19, 17:21:08 UTC] {taskinstance.py:1225} INFO - Marking task as UP_FOR_RETRY. dag_id=batch_kafka_spark_pipeline, task_id=fetch_news_to_kafka, run_id=manual__2026-05-19T17:21:07.146020+00:00, execution_date=20260519T172107, start_date=20260519T172107, end_date=20260519T172108
+[2026-05-19, 17:21:08 UTC] {taskinstance.py:340} ▼ Post task execution logs
+[2026-05-19, 17:21:08 UTC] {standard_task_runner.py:124} ERROR - Failed to execute job 84 for task fetch_news_to_kafka (Bash command failed. The command returned a non-zero exit code 22.; 397)
 Traceback (most recent call last):
+  File "/home/airflow/.local/lib/python3.12/site-packages/airflow/task/task_runner/standard_task_runner.py", line 117, in _start_by_fork
+    ret = args.func(args, dag=self.dag)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.12/site-packages/airflow/cli/cli_config.py", line 49, in command
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.12/site-packages/airflow/utils/cli.py", line 115, in wrapper
+    return f(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.12/site-packages/airflow/cli/commands/task_command.py", line 483, in task_run
+    task_return_code = _run_task_by_selected_method(args, _dag, ti)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.12/site-packages/airflow/cli/commands/task_command.py", line 256, in _run_task_by_selected_method
+    return _run_raw_task(args, ti)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.12/site-packages/airflow/cli/commands/task_command.py", line 341, in _run_raw_task
+    return ti._run_raw_task(
+           ^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.12/site-packages/airflow/utils/session.py", line 97, in wrapper
+    return func(*args, session=session, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.12/site-packages/airflow/models/taskinstance.py", line 3004, in _run_raw_task
+    return _run_raw_task(
+           ^^^^^^^^^^^^^^
   File "/home/airflow/.local/lib/python3.12/site-packages/airflow/models/taskinstance.py", line 273, in _run_raw_task
     TaskInstance._execute_task_with_callbacks(
-  File "/home/airflow/.local/lib/python3.12/site-packages/airflow/models/taskinstance.py", line 3114, in _execute_task_with_callbacks
-    task_orig = self.render_templates(context=context, jinja_env=jinja_env)
-                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/airflow/.local/lib/python3.12/site-packages/airflow/models/taskinstance.py", line 3533, in render_templates
-    original_task.render_template_fields(context, jinja_env)
-  File "/home/airflow/.local/lib/python3.12/site-packages/airflow/models/baseoperator.py", line 1419, in render_template_fields
-    self._do_render_template_fields(self, self.template_fields, context, jinja_env, set())
-  File "/home/airflow/.local/lib/python3.12/site-packages/airflow/models/abstractoperator.py", line 770, in _do_render_template_fields
-    rendered_content = self.render_template(
-                       ^^^^^^^^^^^^^^^^^^^^^
-  File "/home/airflow/.local/lib/python3.12/site-packages/airflow/template/templater.py", line 170, in render_template
-    template = jinja_env.from_string(value)
-               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/airflow/.local/lib/python3.12/site-packages/jinja2/environment.py", line 1108, in from_string
-    return cls.from_code(self, self.compile(source), gs, None)
-                               ^^^^^^^^^^^^^^^^^^^^
-  File "/home/airflow/.local/lib/python3.12/site-packages/jinja2/environment.py", line 768, in compile
-    self.handle_exception(source=source_hint)
-  File "/home/airflow/.local/lib/python3.12/site-packages/jinja2/environment.py", line 939, in handle_exception
-    raise rewrite_traceback_stack(source=source)
-  File "<unknown>", line 3, in template
-jinja2.exceptions.TemplateSyntaxError: unexpected char '`' at 158
-[2026-05-19, 17:06:52 UTC] {taskinstance.py:1225} INFO - Marking task as UP_FOR_RETRY. dag_id=batch_kafka_spark_pipeline, task_id=run_ml_sentiment_analysis, run_id=manual__2026-05-19T17:06:50.935179+00:00, execution_date=20260519T170650, start_date=20260519T170652, end_date=20260519T170652
-[2026-05-19, 17:06:52 UTC] {taskinstance.py:340} ▶ Post task execution logs
+  File "/home/airflow/.local/lib/python3.12/site-packages/airflow/models/taskinstance.py", line 3158, in _execute_task_with_callbacks
+    result = self._execute_task(context, task_orig)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.12/site-packages/airflow/models/taskinstance.py", line 3182, in _execute_task
+    return _execute_task(self, context, task_orig)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.12/site-packages/airflow/models/taskinstance.py", line 762, in _execute_task
+    result = _execute_callable(context=context, **execute_callable_kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.12/site-packages/airflow/models/taskinstance.py", line 733, in _execute_callable
+    return ExecutionCallableRunner(
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.12/site-packages/airflow/utils/operator_helpers.py", line 252, in run
+    return self.func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.12/site-packages/airflow/models/baseoperator.py", line 406, in wrapper
+    return func(self, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.12/site-packages/airflow/operators/bash.py", line 249, in execute
+    raise AirflowException(
+airflow.exceptions.AirflowException: Bash command failed. The command returned a non-zero exit code 22.
+[2026-05-19, 17:21:08 UTC] {local_task_job_runner.py:266} INFO - Task exited with return code 1
+[2026-05-19, 17:21:08 UTC] {taskinstance.py:3900} INFO - 0 downstream tasks scheduled from follow-on schedule check
+[2026-05-19, 17:21:08 UTC] {local_task_job_runner.py:245} ▲▲▲ Log group end
