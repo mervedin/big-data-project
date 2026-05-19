@@ -48,13 +48,9 @@ with DAG(
     run_sentiment_analysis = BashOperator(
         task_id="run_ml_sentiment_analysis",
         bash_command="""
-        HOST_PROJECT_DIR=$(docker inspect $(hostname) | python3 -c "import sys,json; mounts=json.load(sys.stdin)[0]['Mounts']; print(next(m['Source'] for m in mounts if m['Destination']=='/project'))")
-        HOST_DATA_DIR="${HOST_PROJECT_DIR}/data"
-        mkdir -p "${HOST_DATA_DIR}"
-        echo "Writing results to host path: ${HOST_DATA_DIR}"
         docker run --rm \
           --network big-data-project_default \
-          -v "${HOST_DATA_DIR}:/results" \
+          -v big-data-project_results_data:/results \
           big-data-project-spark-job:latest \
         && echo "ML sentiment analysis complete"
         """,
