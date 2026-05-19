@@ -20,23 +20,19 @@ NEWS_API_BASE_URL = "https://newsapi.org/v2"
 KAFKA_BROKER = os.getenv("KAFKA_BROKER", "kafka:9092")
 KAFKA_TOPIC = "news_articles"
 
-# Kafka producer — lazy, reconnects on each call
-kafka_producer = None
-
+# Kafka producer — always reconnects fresh on each call so stale None never blocks
 def get_kafka_producer():
-    global kafka_producer
-    if kafka_producer is None:
-        try:
-            kafka_producer = KafkaProducer(
-                bootstrap_servers=KAFKA_BROKER,
-                value_serializer=lambda v: json.dumps(v).encode("utf-8"),
-                request_timeout_ms=10000,
-            )
-            logger.info("✅ Connected to Kafka")
-        except Exception as e:
-            logger.warning(f"⚠️ Kafka not available: {e}")
-            kafka_producer = None
-    return kafka_producer
+    try:
+        producer = KafkaProducer(
+            bootstrap_servers=KAFKA_BROKER,
+            value_serializer=lambda v: json.dumps(v).encode("utf-8"),
+            request_timeout_ms=10000,
+        )
+        logger.info("✅ Connected to Kafka")
+        return producer
+    except Exception as e:
+        logger.warning(f"⚠️ Kafka not available: {e}")
+        return None
 
 
 # Pydantic models
@@ -326,7 +322,7 @@ async def trigger_sentiment_analysis():
 @app.get("/health", tags=["Health"])
 async def health_check():
     """Health check endpoint"""
-    kafka_status = "connected" if kafka_producer else "disconnected"
+    kafka_status = "connected" if get_kafka_producer() else "disconnected"
     return {
         "status": "healthy",
         "kafka": kafka_status,
