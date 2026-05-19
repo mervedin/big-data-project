@@ -84,17 +84,33 @@ def main():
     # Run DistilBERT sentiment analysis
     result_df = analyze_sentiment(parsed_df)
 
-    # Write output as a single CSV file with header
-    (
-        result_df
-        .coalesce(1)
-        .write
-        .mode("overwrite")
-        .option("header", "true")
-        .csv(OUTPUT_PATH)
-    )
+    # Write to a temp directory first, then rename the part file to sentiments.csv
+    import glob, shutil
 
-    print("✅ Sentiment analysis complete. Results saved to", OUTPUT_PATH)
+    TEMP_PATH = OUTPUT_PATH + "/_tmp_spark_out"
+    FINAL_CSV = OUTPUT_PATH + "/sentiments.csv"
+
+    # Clean up temp dir if exists
+    if os.path.exists(TEMP_PATH):
+        shutil.rmtree(TEMP_PATH)
+
+    result_df.coalesce(1).write.mode("overwrite").option("header", "true").csv(TEMP_PATH)
+
+    # Find the part file and rename it
+    part_files = glob.glob(TEMP_PATH + "/part-*.csv")
+    if part_files:
+        if os.path.exists(FINAL_CSV):
+            os.remove(FINAL_CSV)
+        shutil.move(part_files[0], FINAL_CSV)
+
+    # Clean up temp dir and crc files
+    shutil.rmtree(TEMP_PATH, ignore_errors=True)
+    for crc in glob.glob(OUTPUT_PATH + "/.*.crc"):
+        os.remove(crc)
+    for crc in glob.glob(OUTPUT_PATH + "/*.crc"):
+        os.remove(crc)
+
+    print("✅ Sentiment analysis complete. Results saved to", FINAL_CSV)
     spark.stop()
 
 

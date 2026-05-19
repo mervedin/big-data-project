@@ -51,8 +51,14 @@ with DAG(
         docker run --rm \
           --network big-data-project_default \
           -v big-data-project_results_data:/results \
-          big-data-project-spark-job:latest \
-        && echo "ML sentiment analysis complete"
+          big-data-project-spark-job:latest
+
+        docker run --rm \
+          -v big-data-project_results_data:/results \
+          -v /project/data:/output \
+          busybox sh -c "mkdir -p /output/sentiments && cp /results/sentiments/part-*.csv /output/sentiments/sentiments.csv && echo copied"
+
+        echo "ML sentiment analysis complete"
         """,
         execution_timeout=timedelta(minutes=30),
     )
