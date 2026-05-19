@@ -17,6 +17,13 @@ RUN pip install --no-cache-dir \
     'torch==2.1.2' \
     --extra-index-url https://download.pytorch.org/whl/cpu
 
+# Pre-download DistilBERT model at build time so it's baked into the image.
+# This avoids a 7+ minute download at runtime which causes task timeouts.
+RUN python3 -c "\
+from transformers import pipeline; \
+pipeline('sentiment-analysis', model='distilbert-base-uncased-finetuned-sst-2-english', device=-1); \
+print('Model cached successfully')"
+
 WORKDIR /app
 
 COPY spark_batch.py .
