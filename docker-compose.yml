@@ -95,15 +95,17 @@ services:
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
   
-  kafka-producer:
-    build: ./services/kafka-producer
-    container_name: kafka-producer
-    env_file:
-      - .env
-    depends_on:
-      - kafka
-    volumes:
-      - ./data:/data
+  # ❌ DEPRECATED: Replaced by news-api service which fetches live news
+  # kafka-producer sent only static CSV test data. Use POST /search-and-send-to-kafka instead.
+  # kafka-producer:
+  #   build: ./services/kafka-producer
+  #   container_name: kafka-producer
+  #   env_file:
+  #     - .env
+  #   depends_on:
+  #     - kafka
+  #   volumes:
+  #     - ./data:/data
   
   spark-job:
     build: ./services/spark-job
@@ -121,35 +123,38 @@ services:
     environment:
       NIFI_WEB_HTTP_PORT: 8080
 
-  spark:
-    image: spark:latest
-    container_name: spark-news
-    ports:
-      - "8888:8888"
-      - "7077:7077"
-    environment:
-      SPARK_MODE: master
+  # ❌ DEPRECATED: No longer needed. Using Spark containerized jobs instead.
+  # spark:
+  #   image: spark:latest
+  #   container_name: spark-news
+  #   ports:
+  #     - "8888:8888"
+  #     - "7077:7077"
+  #   environment:
+  #     SPARK_MODE: master
 
-  python-app:
-    env_file:
-      - .env
-    build:
-      context: ./services/python-app
-    container_name: python-news
-    depends_on:
-      - postgres
-      - kafka
-    volumes:
-      - ./data:/data
-      - ./results:/results
-      - ./logs:/logs
-    environment:
-      POSTGRES_HOST: postgres-news
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: newsSentiment
-      POSTGRES_DB: news_sentiment
-      KAFKA_BOOTSTRAP_SERVERS: kafka-news:9092
-    command: python batch_pipeline.py
+  # ❌ DEPRECATED: ML model integrated into spark-job/sentiment_logic.py
+  # python-app service is no longer standalone. The DistilBERT model now runs inside Spark.
+  # python-app:
+  #   env_file:
+  #     - .env
+  #   build:
+  #     context: ./services/python-app
+  #   container_name: python-news
+  #   depends_on:
+  #     - postgres
+  #     - kafka
+  #   volumes:
+  #     - ./data:/data
+  #     - ./results:/results
+  #     - ./logs:/logs
+  #   environment:
+  #     POSTGRES_HOST: postgres-news
+  #     POSTGRES_USER: postgres
+  #     POSTGRES_PASSWORD: newsSentiment
+  #     POSTGRES_DB: news_sentiment
+  #     KAFKA_BOOTSTRAP_SERVERS: kafka-news:9092
+  #   command: python batch_pipeline.py
 
 volumes:
   postgres_data:
