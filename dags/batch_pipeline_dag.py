@@ -43,7 +43,7 @@ with DAG(
         bash_command="""
         docker run --rm \
           --network big-data-project_default \
-          -v /Users/mervedin/Desktop/big_data/big-data-project/results:/results \
+          -v /project/results:/results \
           big-data-project-spark-job:latest \
         && echo "✅ ML sentiment analysis complete"
         """,
