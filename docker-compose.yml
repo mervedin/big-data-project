@@ -112,7 +112,7 @@ services:
     depends_on:
      - kafka
     volumes:
-     - ./results:/results
+     - results_data:/results
     environment:
      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
 
@@ -126,7 +126,7 @@ services:
     ports:
       - "8001:8000"
     volumes:
-      - ./results:/project/results
+      - results_data:/project/results
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
       KAFKA_BROKER: kafka:9092
@@ -174,3 +174,4 @@ services:
 
 volumes:
   postgres_data:
+  results_data:
