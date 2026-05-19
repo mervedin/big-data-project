@@ -13,7 +13,7 @@ with DAG(
     dag_id="batch_kafka_spark_pipeline",
     default_args=default_args,
     start_date=datetime(2024, 1, 1),
-    schedule_interval="@daily",  # ✅ RUNS DAILY AT 00:00 UTC
+    schedule_interval="@daily",
     catchup=False,
     tags=["big-data", "batch", "ml-sentiment"],
 ) as dag:
@@ -44,7 +44,7 @@ with DAG(
         execution_timeout=timedelta(minutes=10),
     )
 
-    # ✅ TASK 2: Run Spark ML sentiment analysis
+    # ✅ TASK 2: Run Spark ML sentiment analysis, then copy result to /project/data
     run_sentiment_analysis = BashOperator(
         task_id="run_ml_sentiment_analysis",
         bash_command="""
@@ -53,10 +53,10 @@ with DAG(
           -v big-data-project_results_data:/results \
           big-data-project-spark-job:latest
 
+        mkdir -p /project/data/sentiments
         docker run --rm \
           -v big-data-project_results_data:/results \
-          -v /project/data:/output \
-          busybox sh -c "mkdir -p /output/sentiments && cp /results/sentiments/part-*.csv /output/sentiments/sentiments.csv && echo copied"
+          busybox cat /results/sentiments/sentiments.csv > /project/data/sentiments/sentiments.csv
 
         echo "ML sentiment analysis complete"
         """,
